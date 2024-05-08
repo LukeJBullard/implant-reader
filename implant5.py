@@ -20,6 +20,21 @@ class WifiChannel:
         self.out_pcap=0
 
 wifichannels=list()
+wifichannels.append(WifiChannel(1,  2412, 2412, 20))
+wifichannels.append(WifiChannel(2,  2417, 2417, 20))
+wifichannels.append(WifiChannel(3,  2422, 2422, 20))
+wifichannels.append(WifiChannel(4,  2427, 2427, 20))
+wifichannels.append(WifiChannel(5,  2432, 2432, 20))
+wifichannels.append(WifiChannel(6,  2437, 2437, 20))
+wifichannels.append(WifiChannel(7,  2442, 2442, 20))
+wifichannels.append(WifiChannel(8,  2447, 2447, 20))
+wifichannels.append(WifiChannel(9,  2452, 2452, 20))
+wifichannels.append(WifiChannel(10, 2457, 2457, 20))
+wifichannels.append(WifiChannel(11, 2462, 2462, 20))
+wifichannels.append(WifiChannel(12, 2467, 2467, 20))
+wifichannels.append(WifiChannel(13, 2472, 2472, 20))
+wifichannels.append(WifiChannel(14, 2484, 2484, 20))
+
 wifichannels.append(WifiChannel(36, 5195, 5180, 40))
 wifichannels.append(WifiChannel(40, 5215, 5200, 40))
 wifichannels.append(WifiChannel(44, 5235, 5220, 40))
@@ -73,6 +88,8 @@ keyboard.on_press_key("q", lambda _: globals().__setitem__('running',False))
 
 def main():
     global running
+    twofour=True
+    five=True
     set_monitor(interface)
     wait_time=2000
     thread_stopping_wait_time=1000
@@ -85,6 +102,11 @@ def main():
             if not running:
                 print()
                 break
+
+            if channel.channel < 36 and not twofour:
+                continue
+            elif channel.channel >= 36 and not five:
+                continue
 
             print(f"Channel: {channel.channel}     \r", end='', flush=True)
             change_channel(interface, channel)
@@ -115,12 +137,14 @@ def main():
         break
 
 def find_broca(file):
+    bytes_to_check = 4
+    trailing_bytes = 2
     search_for = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
     packet_number = 0
     for len, t, pkt in rpcap(file):
         packet_number += 1
 
-        testbytes = pkt[len-3-1:len-1]
+        testbytes = pkt[len-bytes_to_check-trailing_bytes:len-trailing_bytes]
         try:
             utf12_output = decode(testbytes)
         except:
